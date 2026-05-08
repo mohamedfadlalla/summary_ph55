@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch 55 - Summary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>📚 Batch 55 Summary</h1>
+    <p class="subtitle">Select a document to view</p>
+  </header>
+
+  <main>
+    <ul id="file-list" class="file-list"></ul>
+    <div id="loading" class="loading">Loading documents...</div>
+    <div id="error" class="error" style="display: none;">Failed to load documents.</div>
+  </main>
+
+  <footer>
+    <p>Batch 55 &mdash; Summary Documents</p>
+  </footer>
+
+  <script>
+    fetch('files.json')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then(files => {
+        document.getElementById('loading').style.display = 'none';
+        const list = document.getElementById('file-list');
+        if (files.length === 0) {
+          list.innerHTML = '<li class="empty">No documents available.</li>';
+          return;
+        }
+        files.forEach(item => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `page.html?file=${encodeURIComponent(item.file)}`;
+          a.textContent = item.title;
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+      })
+      .catch(err => {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>

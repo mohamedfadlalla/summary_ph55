@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Viewer - Batch 55</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <a href="index.html" class="back-link">← Back to documents</a>
+    <h1 id="doc-title">Loading...</h1>
+  </header>
+
+  <main id="content" class="content">
+    <div id="loading" class="loading">Loading document...</div>
+    <div id="error" class="error" style="display: none;">Failed to load document.</div>
+  </main>
+
+  <footer>
+    <p>Batch 55 &mdash; Summary Documents</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    (function() {
+      const params = new URLSearchParams(window.location.search);
+      const file = params.get('file');
+
+      if (!file) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'No file specified.';
+        document.getElementById('doc-title').textContent = 'Error';
+        return;
+      }
+
+      // Fetch the markdown file
+      fetch('markdown/' + encodeURIComponent(file))
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to load document');
+          return res.text();
+        })
+        .then(markdown => {
+          document.getElementById('loading').style.display = 'none';
+          // Extract title from first H1
+          const titleMatch = markdown.match(/^#\s+(.+)/m);
+          if (titleMatch) {
+            document.getElementById('doc-title').textContent = titleMatch[1].trim();
+          } else {
+            document.getElementById('doc-title').textContent = file.replace(/\.md$/, '');
+          }
+          // Configure marked options
+          marked.setOptions({
+            breaks: true,
+            gfm: true
+          });
+          // Render markdown to HTML
+          const html = marked.parse(markdown);
+          document.getElementById('content').innerHTML = html;
+        })
+        .catch(err => {
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').style.display = 'block';
+          document.getElementById('error').textContent = 'Failed to load document: ' + err.message;
+          document.getElementById('doc-title').textContent = 'Error';
+          console.error(err);
+        });
+    })();
+  </script>
+</body>
+</html>
