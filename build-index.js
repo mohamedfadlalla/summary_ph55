@@ -11,7 +11,9 @@ const result = files.map(file => {
   const content = fs.readFileSync(path.join(markdownDir, file), 'utf-8');
   // Extract the first # heading (title)
   const titleMatch = content.match(/^#\s+(.+)/m);
-  const title = titleMatch ? titleMatch[1].trim() : file.replace(/\.md$/, '');
+  let title = titleMatch ? titleMatch[1].trim() : file.replace(/\.md$/, '');
+  // Strip markdown formatting like **bold**, *italic*, `code`
+  title = title.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1').replace(/`(.+?)`/g, '$1');
   return { file, title };
 });
 
