@@ -36,7 +36,7 @@
       }
 
       // Fetch the markdown file
-      fetch('markdown/' + encodeURIComponent(file))
+      fetch('markdown/' + encodeURIComponent(file) + '?_=' + Date.now())
         .then(res => {
           if (!res.ok) throw new Error('Failed to load document');
           return res.text();
